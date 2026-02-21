@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  startTransition,
 } from "react";
 import type { Locale, Dir } from "@/types";
 import enMessages from "@/locales/en.json";
@@ -50,7 +51,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem("notifyus-locale") as Locale | null;
     if (saved && (saved === "en" || saved === "ar")) {
-      setLocaleState(saved);
+      startTransition(() => {
+        setLocaleState(saved);
+      });
     }
   }, []);
 
