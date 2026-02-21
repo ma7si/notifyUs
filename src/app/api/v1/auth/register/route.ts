@@ -58,7 +58,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    console.error("Registration error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -113,7 +113,6 @@ export async function PUT(
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid input", details: err.issues }, { status: 400 });
     }
-    console.error("Update notification error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

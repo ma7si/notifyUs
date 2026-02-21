@@ -88,7 +88,6 @@ export async function POST(req: NextRequest) {
         { status: 400, headers: CORS }
       );
     }
-    console.error("Track error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500, headers: CORS }

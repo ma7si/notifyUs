@@ -58,10 +58,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(
-      `[NotifyUs] Event "${event}" from user ${user.id} on account ${account.id}`
-    );
-
     return NextResponse.json({ received: true, event });
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -70,7 +66,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    console.error("Events error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

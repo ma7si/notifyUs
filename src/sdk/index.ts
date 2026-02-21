@@ -83,8 +83,8 @@ class NotifyUsSDK {
 
       const { notifications } = await response.json();
       this.renderNotifications(notifications);
-    } catch (err) {
-      console.error("[NotifyUs] Failed to fetch notifications:", err);
+    } catch {
+      // Silently fail
     }
   }
 
