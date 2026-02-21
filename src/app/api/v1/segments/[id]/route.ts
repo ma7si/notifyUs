@@ -55,7 +55,7 @@ export async function PUT(
     }
 
     const segment = await prisma.segment.update({
-      where: { id },
+      where: { id, accountId: account.id },
       data: {
         ...(name ? { name } : {}),
         ...(rules !== undefined

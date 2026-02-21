@@ -44,6 +44,7 @@ class NotifyUsSDK {
   private locale: string = "en";
   private dir: "ltr" | "rtl" = "ltr";
   private renderedIds: Set<string> = new Set();
+  private debug: boolean = false;
 
   init(accountId: string, baseUrl: string) {
     this.accountId = accountId;
@@ -66,6 +67,17 @@ class NotifyUsSDK {
     this.dir = dir;
   }
 
+  setDebug(enabled: boolean) {
+    this.debug = enabled;
+  }
+
+  private log(...args: unknown[]) {
+    if (this.debug) {
+      // eslint-disable-next-line no-console
+      console.log("[NotifyUs]", ...args);
+    }
+  }
+
   private async fetchAndRender() {
     if (!this.accountId) return;
 
@@ -83,8 +95,8 @@ class NotifyUsSDK {
 
       const { notifications } = await response.json();
       this.renderNotifications(notifications);
-    } catch {
-      // Silently fail
+    } catch (err) {
+      this.log("Failed to fetch notifications:", err);
     }
   }
 
@@ -140,7 +152,7 @@ class NotifyUsSDK {
         ${n.imageUrl ? `<img src="${n.imageUrl}" style="height:32px;width:32px;border-radius:6px;object-fit:cover;flex-shrink:0;" alt=""/>` : ""}
         <div style="flex:1;">
           ${n.title ? `<strong>${this.escape(n.title)}</strong> ` : ""}
-          ${n.body ? `<span style="opacity:0.9;">${n.body}</span>` : ""}
+          ${n.body ? `<span style="opacity:0.9;">${this.escape(n.body)}</span>` : ""}
         </div>
         ${n.ctaText ? `
           <button class="nfy-cta" onclick="notifyUs._handleCTA('${n.id}', '${n.ctaUrl || ""}')" style="
@@ -213,7 +225,7 @@ class NotifyUsSDK {
           ` : ""}
           ${n.imageUrl ? `<img src="${n.imageUrl}" style="width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:16px;" alt=""/>` : ""}
           ${n.title ? `<h2 style="margin:0 0 12px;font-size:20px;font-weight:700;">${this.escape(n.title)}</h2>` : ""}
-          ${n.body ? `<p style="margin:0 0 20px;opacity:0.9;line-height:1.6;">${n.body}</p>` : ""}
+          ${n.body ? `<p style="margin:0 0 20px;opacity:0.9;line-height:1.6;">${this.escape(n.body)}</p>` : ""}
           ${n.ctaText ? `
             <button onclick="notifyUs._handleCTA('${n.id}', '${n.ctaUrl || ""}')" style="
               width: 100%;
@@ -257,7 +269,7 @@ class NotifyUsSDK {
         <div style="display:flex;align-items:start;justify-content:space-between;gap:8px;">
           <div style="flex:1;">
             ${n.title ? `<p style="margin:0 0 4px;font-weight:600;">${this.escape(n.title)}</p>` : ""}
-            ${n.body ? `<p style="margin:0;opacity:0.85;font-size:13px;">${n.body}</p>` : ""}
+            ${n.body ? `<p style="margin:0;opacity:0.85;font-size:13px;">${this.escape(n.body)}</p>` : ""}
             ${n.ctaText ? `
               <button onclick="notifyUs._handleCTA('${n.id}', '${n.ctaUrl || ""}')" style="
                 background:none;border:none;color:${n.ctaColor};font-size:13px;font-weight:600;
@@ -318,8 +330,8 @@ class NotifyUsSDK {
           ctaUrl,
         }),
       });
-    } catch {
-      // Silently fail
+    } catch (err) {
+      this.log("Failed to track event:", err);
     }
   }
 

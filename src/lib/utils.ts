@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { randomBytes } from "crypto";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,12 +32,7 @@ export function calcCTR(impressions: number, clicks: number): string {
 }
 
 export function generateApiKey(): string {
-  return (
-    "nfy_" +
-    Array.from(crypto.getRandomValues(new Uint8Array(24)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
-  );
+  return "nfy_" + randomBytes(24).toString("hex");
 }
 
 export function truncate(str: string, maxLength: number): string {

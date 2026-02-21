@@ -2,6 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+// Simple in-memory rate limiter
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 100;
+
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function isRateLimited(key: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(key);
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(key, {
+      count: 1,
+      resetTime: now + RATE_LIMIT_WINDOW_MS,
+    });
+    return false;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return true;
+  }
+
+  record.count++;
+  return false;
+}
+
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -17,6 +43,15 @@ const trackSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Rate limit by IP
+  const ip = req.ip ?? req.headers.get("x-forwarded-for") ?? "unknown";
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded" },
+      { status: 429, headers: CORS }
+    );
+  }
+
   try {
     const body = await req.json();
     const { accountId, notificationId, userId, event, ctaUrl } =

@@ -97,7 +97,7 @@ export async function PUT(
     }
 
     const notification = await prisma.notification.update({
-      where: { id },
+      where: { id, accountId: account.id },
       data: updateData,
       include: {
         _count: { select: { impressions: true, clicks: true } },
